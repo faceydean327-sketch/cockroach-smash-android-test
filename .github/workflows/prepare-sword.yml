@@ -1,0 +1,21 @@
+name: Prepare sword game download
+on: [push, workflow_dispatch]
+permissions:
+  contents: write
+concurrency:
+  group: sword-game
+  cancel-in-progress: true
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cat sword-part-*.txt | base64 -d > Cockroach_Smmash_Sword.tmp
+          mv Cockroach_Smmash_Sword.tmp Cockroach_Smash_Sword.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Cockroach_Smash_Sword.apk
+          git diff --cached --quiet || git commit -m "Add sword game download"
+          git push
