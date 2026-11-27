@@ -1,0 +1,17 @@
+name: Prepare Android download
+on: [push, workflow_dispatch]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          base64 -d android-test.apk.b64 > Cockroach_Smash_Android_Test.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Cockroach_Smash_Android_Test.apk
+          git diff --cached --quiet || git commit -m "Add Android test download"
+          git push
