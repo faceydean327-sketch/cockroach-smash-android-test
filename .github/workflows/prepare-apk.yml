@@ -1,0 +1,26 @@
+name: Prepare native 3D APK
+on: [push]
+permissions:
+  contents: write
+concurrency:
+  group: roach-simulator-apk
+  cancel-in-progress: true
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify, publish, and remove staging data
+        run: |
+          set -euo pipefail
+          for part in roach3d-part-*.txt; do test -f "$part"; done
+          cat roach3d-part-*.txt | base64 -d > Roach_Simulator_3D_Native.apk
+          echo "c7dee434ed463afbd3201760b72d00d46c16c3996a315bea18b93a4845104481  Roach_Simulator_3D_Native.apk" | sha256sum -c -
+          rm roach3d-part-*.txt
+          rm .github/workflows/prepare-apk.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Publish native 3D roach simulator APK"
+          git push
