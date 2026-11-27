@@ -1,0 +1,20 @@
+name: Prepare fullscreen game
+on: [push, workflow_dispatch]
+permissions:
+  contents: write
+concurrency:
+  group: fullscreen-game
+  cancel-in-progress: true
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cat fullscreen-part-0*.txt | base64 -d > Cockroach_Smash_Full_Screen.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Cockroach_Smash_Full_Screen.apk
+          git diff --cached --quiet || git commit -m "Add full screen game download"
+          git push
