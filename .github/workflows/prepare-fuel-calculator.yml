@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: fuel-calculator
+  cancel-in-progress: true
 jobs:
   prepare:
     if: github.actor != 'github-actions[bot]'
@@ -14,10 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          cat fuelcalc-parts/part-*.txt | base64 -d > Fuel_Cost_Calculator.apk
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Fuel_Cost_Calculator.apk
-          git diff --cached --quiet || git commit -m "Add fuel calculator download"
-          for i in 1 2 3 4 5; do git pull --rebase && git push && exit 0; sleep 5; done
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cat fuelcalc-parts/part-*.txt | base64 -d > Fuel_Cost_Calculator.apk
+            git add Fuel_Cost_Calculator.apk
+            git diff --cached --quiet && exit 0
+            git commit -m "Update fuel calculator download"
+            git push origin HEAD:main && exit 0
+            sleep 5
+          done
           exit 1
