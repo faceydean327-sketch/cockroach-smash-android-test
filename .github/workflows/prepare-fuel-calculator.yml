@@ -2,7 +2,6 @@ name: Prepare fuel calculator download
 on:
   push:
     paths:
-      - fuelcalc-parts/**
       - .github/workflows/prepare-fuel-calculator.yml
   workflow_dispatch:
 permissions:
