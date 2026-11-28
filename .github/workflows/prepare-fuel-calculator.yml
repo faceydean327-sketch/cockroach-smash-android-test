@@ -29,3 +29,5 @@ jobs:
             sleep 5
           done
           exit 1
+
+# Build redesigned fuel app
